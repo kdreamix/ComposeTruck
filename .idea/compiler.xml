@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="15" />
+    <bytecodeTargetLevel target="15">
+      <module name="ComposeTruck.common.commonTest" target="1.6" />
+      <module name="ComposeTruck.common.desktopTest" target="1.6" />
+      <module name="ComposeTruck.desktop.commonTest" target="1.6" />
+      <module name="ComposeTruck.desktop.jvmTest" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
