@@ -16,10 +16,13 @@ kotlin {
         }
     }
     sourceSets {
+        val ktor_version = "1.6.2"
         val jvmMain by getting {
             dependencies {
                 implementation(project(":common"))
                 implementation(compose.desktop.currentOs)
+                implementation("io.ktor:ktor-client-curl:$ktor_version")
+
             }
         }
         val jvmTest by getting

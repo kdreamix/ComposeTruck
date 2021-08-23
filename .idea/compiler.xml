@@ -4,8 +4,12 @@
     <bytecodeTargetLevel target="15">
       <module name="ComposeTruck.common.commonTest" target="1.6" />
       <module name="ComposeTruck.common.desktopTest" target="1.6" />
+      <module name="ComposeTruck.desktop.commonMain" target="11" />
       <module name="ComposeTruck.desktop.commonTest" target="1.6" />
+      <module name="ComposeTruck.desktop.jvmMain" target="11" />
       <module name="ComposeTruck.desktop.jvmTest" target="1.6" />
+      <module name="me.kit.ComposeTruck.desktop.commonTest" target="11" />
+      <module name="me.kit.ComposeTruck.desktop.jvmTest" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

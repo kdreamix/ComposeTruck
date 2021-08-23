@@ -28,11 +28,13 @@ kotlin {
         val ktor_version = "1.6.2"
         val logack_version = "1.2.5"
         val kodein = "7.5.0"
+        val kotlinx_serialization_json = "1.2.2"
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_json")
                 api("io.ktor:ktor-client-core:$ktor_version")
                 api("io.ktor:ktor-client-cio:$ktor_version")
                 api("io.ktor:ktor-client-serialization:$ktor_version")
@@ -57,6 +59,8 @@ kotlin {
         }
         val desktopMain by getting
         val desktopTest by getting
+
+
     }
 }
 
