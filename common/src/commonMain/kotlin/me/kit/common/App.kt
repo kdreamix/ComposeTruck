@@ -13,7 +13,7 @@ import org.kodein.di.compose.withDI
 fun App() = withDI(commonModule) {
     var text by remember { mutableStateOf("Hello, World!") }
 
-    var truckRoute by remember { mutableStateOf<TruckRouteResponse>() }
+    var truckRoute by remember { mutableStateOf<TruckRouteResponse?>(null) }
 
     val api by instance<TruckApis>()
 
