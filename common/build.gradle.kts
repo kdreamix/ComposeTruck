@@ -58,6 +58,11 @@ kotlin {
             }
         }
         val desktopMain by getting
+        //{
+//            dependencies {
+//                implementation("io.ktor:ktor-client-curl:$ktor_version")
+//            }
+        //}
         val desktopTest by getting
 
 
