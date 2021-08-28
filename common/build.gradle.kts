@@ -58,7 +58,11 @@ kotlin {
                 implementation("junit:junit:4.13")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-java:$ktor_version")
+            }
+        }
         val desktopTest by getting
 
 

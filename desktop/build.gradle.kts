@@ -9,6 +9,9 @@ plugins {
 group = "me.kit"
 version = "1.0"
 
+repositories {
+    google()
+}
 kotlin {
     jvm {
         compilations.all {
@@ -21,6 +24,7 @@ kotlin {
             dependencies {
                 implementation(project(":common"))
                 implementation(compose.desktop.currentOs)
+
             }
         }
         val jvmTest by getting

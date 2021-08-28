@@ -10,12 +10,17 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 val androidHttpClient = HttpClient(OkHttp) {
+
     install(Logging) {
         logger = Logger.DEFAULT
         level = LogLevel.ALL
     }
+    
     install(JsonFeature){
-        serializer = KotlinxSerializer()
+        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+            prettyPrint = true
+            isLenient = true
+        })
     }
 
     defaultRequest {

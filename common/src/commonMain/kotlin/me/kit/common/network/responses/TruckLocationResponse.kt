@@ -24,6 +24,3 @@ data class TruckLocation(
     val cityId: String,
     val cityName: String,
 )
-
-@Serializable
-data class TruckLocationResponse(val truckLocations: List<TruckLocation>)
