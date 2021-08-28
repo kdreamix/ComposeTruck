@@ -5,7 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import me.kit.common.module.commonModule
 import me.kit.common.network.TruckApis
-import me.kit.common.network.responses.TruckRouteResponse
+import me.kit.common.network.responses.TruckRoute
 import org.kodein.di.compose.instance
 import org.kodein.di.compose.withDI
 
@@ -13,7 +13,7 @@ import org.kodein.di.compose.withDI
 fun App() = withDI(commonModule) {
     var text by remember { mutableStateOf("Hello, World!") }
 
-    var truckRoute by remember { mutableStateOf<TruckRouteResponse?>(null) }
+    var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
 
     val api by instance<TruckApis>()
 
@@ -22,7 +22,7 @@ fun App() = withDI(commonModule) {
     }
     MaterialTheme {
         Button(onClick = {
-            text = "Hello, ${getPlatformName()}"
+            text = "Hello, ${truckRoute.toString()}"
         }) {
             Text(text)
         }

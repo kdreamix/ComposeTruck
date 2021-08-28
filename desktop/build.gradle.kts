@@ -3,7 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "0.3.1"
+    id("org.jetbrains.compose") version "1.0.0-alpha3"
 }
 
 group = "me.kit"
@@ -21,8 +21,6 @@ kotlin {
             dependencies {
                 implementation(project(":common"))
                 implementation(compose.desktop.currentOs)
-                implementation("io.ktor:ktor-client-curl:$ktor_version")
-
             }
         }
         val jvmTest by getting

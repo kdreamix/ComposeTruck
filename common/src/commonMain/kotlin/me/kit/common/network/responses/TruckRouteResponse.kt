@@ -38,15 +38,10 @@ import kotlinx.serialization.Serializable
 、wgs84aY(wgs84a經度)*/
 
 @Serializable
-data class TruckRouteResponse(
-    val route: List<TruckRoute> = emptyList()
-)
-
-@Serializable
 data class TruckRoute(
     val recyclingSunday: String? = null,
-    val wgsAY: String? = null,
-    val wgsAX: String? = null,
+    val wgs84aX: String? = null,
+    val wgs84aY: String? = null,
     val garbageThursday: String? = "",
     val city: String? = "",
     val latitude: String? = "",
@@ -71,9 +66,9 @@ data class TruckRoute(
     val garbageWednesday: String? = null,
     val foodScrapsTuesday: String? = "",
     val recyclingWednesday: String? = null,
-    val twdX: String? = "",
+    val twd97X: String? = "",
+    val twd97Y: String? = "",
     val garbageFriday: String? = "",
-    val twdY: String? = "",
     val name: String? = "",
     val garbageSunday: String? = null,
     val foodScrapsThursday: String? = "",
