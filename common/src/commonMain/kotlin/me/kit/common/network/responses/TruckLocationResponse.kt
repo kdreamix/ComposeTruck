@@ -23,4 +23,7 @@ data class TruckLocation(
     val latitude: String,
     val cityId: String,
     val cityName: String,
-)
+){
+    val latitudeDouble = latitude.toDouble()
+    val longitudeDouble = longitude.toDouble()
+}
