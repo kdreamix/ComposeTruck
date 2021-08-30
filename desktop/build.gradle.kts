@@ -24,6 +24,7 @@ kotlin {
             dependencies {
                 implementation(project(":common"))
                 implementation(compose.desktop.currentOs)
+                implementation("org.jxmapviewer:jxmapviewer2:2.6")
 
             }
         }
