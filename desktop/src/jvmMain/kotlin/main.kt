@@ -62,8 +62,8 @@ fun createMap(): JXMapViewer {
     val info: TileFactoryInfo = OSMTileFactoryInfo()
     val tileFactory = DefaultTileFactory(info)
     mapViewer.tileFactory = tileFactory
-    mapViewer.addressLocation = GeoPosition(121.430873333333,25.2095566666667)
-    mapViewer.zoom = 5
+    mapViewer.addressLocation = GeoPosition(25.0143878,121.4798943)
+    mapViewer.zoom = 3
     return mapViewer
 }
 
@@ -85,6 +85,7 @@ fun BikeShareView() = withDI(commonModule) {
             }
             wpSet.add(wp)
         }
+        // wpSet.add(Waypoint {GeoPosition(25.0143878,121.4798943)})
         wpp.waypoints = wpSet
         map?.overlayPainter = wpp
         map?.invalidate()
