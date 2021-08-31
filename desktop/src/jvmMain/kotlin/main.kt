@@ -1,11 +1,17 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.desktop.Window
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import me.kit.common.module.commonModule
 import me.kit.common.ui.TruckList
 import me.kit.commonDomain.network.TruckApis
@@ -17,16 +23,56 @@ import org.jxmapviewer.viewer.*
 import org.kodein.di.compose.rememberInstance
 import org.kodein.di.compose.withDI
 import java.awt.GridLayout
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
-import javax.swing.WindowConstants
+import javax.swing.*
+import javax.swing.Icon
 
-fun main()  {
-    SwingComposeWindow()
+fun main() = Window() {
+    App()
 }
 
 var map: JXMapViewer? = null
 
+@Composable
+fun App(){
+    MaterialTheme {
+        Scaffold(
+            content = { JMap() },
+            topBar =  { TruckAppBar() },
+
+        )
+    }
+}
+
+@Composable
+fun TruckAppBar() {
+    TopAppBar(title = { Text("Truck Map") }, navigationIcon = {
+        IconButton(onClick = {/* Do Something*/ }) {
+            Icon(Icons.Filled.ArrowBack, null)
+        }
+    }, actions = {
+        IconButton(onClick = {/* Do Something*/ }) {
+            Icon(Icons.Filled.Share, null)
+        }
+        IconButton(onClick = {/* Do Something*/ }) {
+            Icon(Icons.Filled.Settings, null)
+        }
+    })
+}
+
+@Composable
+fun JMap(){
+    SwingPanel(
+        background = Color.White,
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+        factory = {
+            JPanel().apply {
+                map = createMap()
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                add(map)
+            }
+        }
+    )
+}
 fun SwingComposeWindow() = SwingUtilities.invokeLater {
     val window = JFrame()
     window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
