@@ -23,6 +23,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(project(":common"))
+                implementation(project(mapOf("path" to ":commonDomain")))
                 implementation(compose.desktop.currentOs)
                 implementation("org.jxmapviewer:jxmapviewer2:2.6")
 

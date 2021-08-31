@@ -1,8 +1,7 @@
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.0.0-alpha3"
+    kotlin("plugin.serialization") version "1.5.20"
     id("com.android.library")
     id("kotlin-android-extensions")
 }
@@ -23,7 +22,6 @@ kotlin {
             kotlinOptions.jvmTarget = "11"
         }
     }
-
     sourceSets {
         val ktor_version = "1.6.2"
         val logack_version = "1.2.5"
@@ -31,13 +29,14 @@ kotlin {
         val kotlinx_serialization_json = "1.2.2"
         val commonMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_json")
+                api("io.ktor:ktor-client-core:$ktor_version")
+                api("io.ktor:ktor-client-cio:$ktor_version")
+                api("io.ktor:ktor-client-serialization:$ktor_version")
+                api("ch.qos.logback:logback-classic:$logack_version")
+                api("io.ktor:ktor-client-logging:$ktor_version")
                 api("org.kodein.di:kodein-di:$kodein")
                 api("org.kodein.di:kodein-di-framework-compose:$kodein")
-                implementation(project(mapOf("path" to ":commonDomain")))
-
             }
         }
         val commonTest by getting
@@ -45,6 +44,8 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.3.1")
                 api("androidx.core:core-ktx:1.6.0")
+                implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_json")
             }
         }
         val androidTest by getting {
@@ -55,7 +56,6 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-java:$ktor_version")
-
             }
         }
         val desktopTest by getting
@@ -72,7 +72,3 @@ android {
         targetSdkVersion(30)
     }
 }
-dependencies {
-    implementation(project(mapOf("path" to ":commonDomain")))
-}
-

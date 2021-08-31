@@ -1,4 +1,4 @@
-package me.kit.common.network.responses
+package me.kit.commonDomain.network.responses
 
 import kotlinx.serialization.Serializable
 

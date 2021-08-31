@@ -1,4 +1,4 @@
-package me.kit.common.network
+package me.kit.commonDomain.network
 
 object EndPoints {
     const val BASE_URL = "https://data.ntpc.gov.tw"

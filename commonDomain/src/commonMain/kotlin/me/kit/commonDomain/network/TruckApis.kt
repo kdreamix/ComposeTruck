@@ -1,9 +1,9 @@
-package me.kit.common.network
+package me.kit.commonDomain.network
 
 import io.ktor.client.*
 import io.ktor.client.request.*
-import me.kit.common.network.responses.TruckLocation
-import me.kit.common.network.responses.TruckRoute
+import me.kit.commonDomain.network.responses.TruckLocation
+import me.kit.commonDomain.network.responses.TruckRoute
 
 interface TruckApis {
     suspend fun fetchTruckRoute(): List<TruckRoute>

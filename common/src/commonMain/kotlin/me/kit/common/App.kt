@@ -7,16 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.kit.common.module.commonModule
-import me.kit.common.network.TruckApis
-import me.kit.common.network.responses.TruckLocation
-import me.kit.common.network.responses.TruckRoute
+import me.kit.commonDomain.network.TruckApis
+import me.kit.commonDomain.network.responses.TruckLocation
+import me.kit.commonDomain.network.responses.TruckRoute
 import org.kodein.di.compose.instance
 import org.kodein.di.compose.withDI
 

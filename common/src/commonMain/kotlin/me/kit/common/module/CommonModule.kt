@@ -1,7 +1,7 @@
 package me.kit.common.module
 
-import me.kit.common.network.TruckApis
-import me.kit.common.network.TruckApisImpl
+import me.kit.commonDomain.network.TruckApisImpl
+import me.kit.commonDomain.network.TruckApis
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance

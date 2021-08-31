@@ -1,7 +1,6 @@
 plugins {
     id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("com.android.application")
-    kotlin("plugin.serialization") version "1.5.20"
     kotlin("android")
 }
 

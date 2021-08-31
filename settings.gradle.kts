@@ -14,4 +14,5 @@ rootProject.name = "ComposeTruck"
 include(":android")
 include(":desktop")
 include(":common")
+include(":commonDomain")
 

@@ -11,7 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import me.kit.common.network.responses.TruckLocation
+import me.kit.commonDomain.network.responses.TruckLocation
 
 @Composable
 fun TruckList(truckLocation: List<TruckLocation>, onClick: (TruckLocation) -> Unit) {

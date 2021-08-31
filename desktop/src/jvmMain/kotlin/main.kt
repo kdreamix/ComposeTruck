@@ -7,10 +7,10 @@ import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import me.kit.common.module.commonModule
-import me.kit.common.network.TruckApis
-import me.kit.common.network.responses.TruckLocation
-import me.kit.common.network.responses.TruckRoute
 import me.kit.common.ui.TruckList
+import me.kit.commonDomain.network.TruckApis
+import me.kit.commonDomain.network.responses.TruckLocation
+import me.kit.commonDomain.network.responses.TruckRoute
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.*
