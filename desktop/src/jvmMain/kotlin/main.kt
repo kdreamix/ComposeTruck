@@ -10,8 +10,14 @@ import androidx.compose.desktop.Window
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.ui.zIndex
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.kit.common.module.commonModule
 import me.kit.common.ui.TruckList
 import me.kit.commonDomain.network.TruckApis
@@ -24,30 +30,51 @@ import org.kodein.di.compose.rememberInstance
 import org.kodein.di.compose.withDI
 import java.awt.GridLayout
 import javax.swing.*
-import javax.swing.Icon
 
-fun main() = Window() {
+fun main() = Window {
+    Napier.base(DebugAntilog())
     App()
 }
 
 var map: JXMapViewer? = null
 
 @Composable
-fun App(){
+fun App() {
+    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Open))
+    val scope = rememberCoroutineScope()
+
+
     MaterialTheme {
         Scaffold(
+            scaffoldState = scaffoldState,
             content = { JMap() },
-            topBar =  { TruckAppBar() },
-
+            topBar = {
+                TruckAppBar(onMenuClick = {
+                    Napier.d("Menu Clicked")
+                    scope.toggleDrawer(scaffoldState)
+                })
+            },
+            drawerContent = { TruckList() }
         )
     }
 }
 
+fun CoroutineScope.toggleDrawer(scaffoldState: ScaffoldState) {
+    launch {
+        if (scaffoldState.drawerState.isClosed) scaffoldState.drawerState.open() else scaffoldState.drawerState.close()
+    }
+}
+
 @Composable
-fun TruckAppBar() {
+fun DrawerContent() {
+    TruckList()
+}
+
+@Composable
+fun TruckAppBar(onMenuClick: () -> Unit) {
     TopAppBar(title = { Text("Truck Map") }, navigationIcon = {
-        IconButton(onClick = {/* Do Something*/ }) {
-            Icon(Icons.Filled.ArrowBack, null)
+        IconButton(onClick = { onMenuClick() }) {
+            Icon(Icons.Filled.Menu, null)
         }
     }, actions = {
         IconButton(onClick = {/* Do Something*/ }) {
@@ -60,7 +87,7 @@ fun TruckAppBar() {
 }
 
 @Composable
-fun JMap(){
+fun JMap() {
     SwingPanel(
         background = Color.White,
         modifier = Modifier.fillMaxWidth().fillMaxHeight(),
@@ -73,25 +100,6 @@ fun JMap(){
         }
     )
 }
-fun SwingComposeWindow() = SwingUtilities.invokeLater {
-    val window = JFrame()
-    window.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-    window.title = "Truck Map"
-
-    map = createMap()
-
-    val composePanel = ComposePanel()
-    window.layout = GridLayout(1, 2)
-    window.add(composePanel)
-    window.add(map)
-
-    composePanel.setContent {
-        BikeShareView()
-    }
-
-    window.setSize(900, 600)
-    window.isVisible = true
-}
 
 fun createMap(): JXMapViewer {
     val mapViewer = JXMapViewer()
@@ -99,12 +107,12 @@ fun createMap(): JXMapViewer {
     val info: TileFactoryInfo = OSMTileFactoryInfo()
     val tileFactory = DefaultTileFactory(info)
     mapViewer.tileFactory = tileFactory
-    mapViewer.addressLocation = GeoPosition(25.0143878,121.4798943)
+    mapViewer.addressLocation = GeoPosition(25.0143878, 121.4798943)
     mapViewer.zoom = 3
     return mapViewer
 }
 
-fun focusOn(latitude:Double, longitude:Double){
+fun focusOn(latitude: Double, longitude: Double) {
     map?.addressLocation = GeoPosition(latitude, longitude)
 }
 
@@ -123,7 +131,7 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
 }
 
 @Composable
-fun BikeShareView() = withDI(commonModule) {
+fun TruckList() = withDI(commonModule) {
     var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
     var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
 
@@ -135,18 +143,17 @@ fun BikeShareView() = withDI(commonModule) {
         addWayPoints(truckLocation)
     }
 
-    MaterialTheme {
-        Row {
-            Box(Modifier.fillMaxWidth().fillMaxHeight().background(color = Color(0xff100c08))) {
-                TruckList(truckLocation){
-                    focusOn(it.latitudeDouble,it.longitudeDouble)
-                }
-                Spacer(
-                    modifier = Modifier.width(1.dp).fillMaxHeight()
-                        .background(color = MaterialTheme.colors.onSurface.copy(0.25f))
-                )
+    Row(modifier = Modifier.fillMaxHeight()) {
+        Box(Modifier.width(200.dp).fillMaxHeight().background(color = Color(0xff100c08))) {
+            TruckList(truckLocation) {
+                focusOn(it.latitudeDouble, it.longitudeDouble)
             }
+            Spacer(
+                modifier = Modifier.width(1.dp).fillMaxHeight()
+                    .background(color = MaterialTheme.colors.onSurface.copy(0.25f))
+            )
         }
     }
+
 }
 

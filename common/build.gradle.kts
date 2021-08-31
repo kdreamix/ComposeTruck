@@ -29,6 +29,7 @@ kotlin {
         val logack_version = "1.2.5"
         val kodein = "7.7.0"
         val kotlinx_serialization_json = "1.2.2"
+        val napierVersion = "2.1.0"
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
@@ -37,6 +38,7 @@ kotlin {
                 api("org.kodein.di:kodein-di:$kodein")
                 api("org.kodein.di:kodein-di-framework-compose:$kodein")
                 implementation(project(mapOf("path" to ":commonDomain")))
+                api("io.github.aakira:napier:$napierVersion")
 
             }
         }
