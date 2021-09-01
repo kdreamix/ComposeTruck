@@ -1,3 +1,6 @@
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -13,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.zIndex
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -31,6 +35,7 @@ import org.kodein.di.compose.withDI
 import java.awt.GridLayout
 import javax.swing.*
 
+@ExperimentalAnimationApi
 fun main() = Window {
     Napier.base(DebugAntilog())
     App()
@@ -39,22 +44,23 @@ fun main() = Window {
 var map: JXMapViewer? = null
 
 @Composable
+@ExperimentalAnimationApi
 fun App() {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Open))
     val scope = rememberCoroutineScope()
+    var truckListVisible by remember { mutableStateOf(true) }
 
 
     MaterialTheme {
         Scaffold(
             scaffoldState = scaffoldState,
-            content = { JMap() },
+            content = { Content(truckListVisible) },
             topBar = {
                 TruckAppBar(onMenuClick = {
                     Napier.d("Menu Clicked")
-                    scope.toggleDrawer(scaffoldState)
+                    truckListVisible = !truckListVisible
                 })
             },
-            drawerContent = { TruckList() }
         )
     }
 }
@@ -66,8 +72,12 @@ fun CoroutineScope.toggleDrawer(scaffoldState: ScaffoldState) {
 }
 
 @Composable
-fun DrawerContent() {
-    TruckList()
+@ExperimentalAnimationApi
+fun Content(truckListVisible:Boolean) {
+    Row {
+        TruckList(truckListVisible)
+        JMap()
+    }
 }
 
 @Composable
@@ -88,17 +98,21 @@ fun TruckAppBar(onMenuClick: () -> Unit) {
 
 @Composable
 fun JMap() {
-    SwingPanel(
-        background = Color.White,
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-        factory = {
-            JPanel().apply {
-                map = createMap()
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(map)
+    Box {
+        SwingPanel(
+            background = Color.White,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            factory = {
+                JPanel().apply {
+                    map = createMap()
+                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                    add(map)
+                    setComponentZOrder(map,0)
+                }
             }
-        }
-    )
+        )
+    }
+
 }
 
 fun createMap(): JXMapViewer {
@@ -131,9 +145,12 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
 }
 
 @Composable
-fun TruckList() = withDI(commonModule) {
+@ExperimentalAnimationApi
+fun TruckList(visible: Boolean) = withDI(commonModule) {
     var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
     var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
+
+    val density = LocalDensity.current
 
     val api by rememberInstance<TruckApis>()
 
@@ -143,7 +160,9 @@ fun TruckList() = withDI(commonModule) {
         addWayPoints(truckLocation)
     }
 
-    Row(modifier = Modifier.fillMaxHeight()) {
+    AnimatedVisibility(visible,enter = slideInHorizontally(
+        initialOffsetX = { with(density) { -40.dp.roundToPx() } }
+    )){
         Box(Modifier.width(200.dp).fillMaxHeight().background(color = Color(0xff100c08))) {
             TruckList(truckLocation) {
                 focusOn(it.latitudeDouble, it.longitudeDouble)
@@ -154,6 +173,9 @@ fun TruckList() = withDI(commonModule) {
             )
         }
     }
+
+
+
 
 }
 
