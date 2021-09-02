@@ -3,6 +3,7 @@ package me.kit.common.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -12,9 +13,11 @@ import androidx.compose.ui.unit.dp
 import me.kit.commonDomain.network.responses.TruckLocation
 
 @Composable
-fun TruckLazyColumn(truckLocation: List<TruckLocation>, onClick: (TruckLocation) -> Unit) {
+fun TruckLazyColumn(truckLocation: List<TruckLocation>, state: LazyListState, onClick: (TruckLocation) -> Unit) {
     LazyColumn(
+        contentPadding = PaddingValues(all = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
+        state = state
     ) {
         items(truckLocation) { where ->
             TruckCard(where) { onClick(where) }
@@ -23,7 +26,7 @@ fun TruckLazyColumn(truckLocation: List<TruckLocation>, onClick: (TruckLocation)
 }
 
 @Composable
-fun TruckCard(truckLocation: TruckLocation, onClick: (TruckLocation) -> Unit){
+fun TruckCard(truckLocation: TruckLocation, onClick: (TruckLocation) -> Unit) {
     Card(
         modifier = Modifier
             .width(300.dp)
