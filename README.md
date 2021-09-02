@@ -6,7 +6,7 @@ A kotlin multiplatform app for getting garbage trucks location and routing quick
 ---
 ### Screenshot 
 #### JVM:
-![plot](./screenshot.png)
+![plot](./screenshot.PNG)
 
 ---
 ### TODO
