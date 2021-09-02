@@ -5,25 +5,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.desktop.Window
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.zIndex
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.kit.common.module.commonModule
-import me.kit.common.ui.TruckList
+import me.kit.common.ui.TruckLazyColumn
 import me.kit.commonDomain.network.TruckApis
 import me.kit.commonDomain.network.responses.TruckLocation
 import me.kit.commonDomain.network.responses.TruckRoute
@@ -32,7 +29,6 @@ import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.*
 import org.kodein.di.compose.rememberInstance
 import org.kodein.di.compose.withDI
-import java.awt.GridLayout
 import javax.swing.*
 
 @ExperimentalAnimationApi
@@ -46,14 +42,11 @@ var map: JXMapViewer? = null
 @Composable
 @ExperimentalAnimationApi
 fun App() {
-    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Open))
     val scope = rememberCoroutineScope()
     var truckListVisible by remember { mutableStateOf(true) }
 
-
     MaterialTheme {
         Scaffold(
-            scaffoldState = scaffoldState,
             content = { Content(truckListVisible) },
             topBar = {
                 TruckAppBar(onMenuClick = {
@@ -65,17 +58,11 @@ fun App() {
     }
 }
 
-fun CoroutineScope.toggleDrawer(scaffoldState: ScaffoldState) {
-    launch {
-        if (scaffoldState.drawerState.isClosed) scaffoldState.drawerState.open() else scaffoldState.drawerState.close()
-    }
-}
-
 @Composable
 @ExperimentalAnimationApi
-fun Content(truckListVisible:Boolean) {
+fun Content(truckListVisible: Boolean) {
     Row {
-        TruckList(truckListVisible)
+        Drawer(truckListVisible)
         JMap()
     }
 }
@@ -107,7 +94,7 @@ fun JMap() {
                     map = createMap()
                     layout = BoxLayout(this, BoxLayout.Y_AXIS)
                     add(map)
-                    setComponentZOrder(map,0)
+                    setComponentZOrder(map, 0)
                 }
             }
         )
@@ -133,9 +120,14 @@ fun focusOn(latitude: Double, longitude: Double) {
 private fun addWayPoints(truckLocation: List<TruckLocation>) {
     val wpp = WaypointPainter<Waypoint>()
     val wpSet = mutableSetOf<Waypoint>()
-    truckLocation.forEach {
+    truckLocation.forEach { location ->
         val wp = Waypoint {
-            GeoPosition(it.latitude.toDouble(), it.longitude.toDouble())
+            location.latitude?.let { latitude ->
+                location.longitude?.let { longitude ->
+                    GeoPosition(latitude.toDouble(), longitude.toDouble())
+
+                }
+            }
         }
         wpSet.add(wp)
     }
@@ -146,7 +138,7 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
 
 @Composable
 @ExperimentalAnimationApi
-fun TruckList(visible: Boolean) = withDI(commonModule) {
+fun Drawer(visible: Boolean) = withDI(commonModule) {
     var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
     var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
 
@@ -160,22 +152,22 @@ fun TruckList(visible: Boolean) = withDI(commonModule) {
         addWayPoints(truckLocation)
     }
 
-    AnimatedVisibility(visible,enter = slideInHorizontally(
+    AnimatedVisibility(visible, enter = slideInHorizontally(
         initialOffsetX = { with(density) { -40.dp.roundToPx() } }
-    )){
-        Box(Modifier.width(200.dp).fillMaxHeight().background(color = Color(0xff100c08))) {
-            TruckList(truckLocation) {
-                focusOn(it.latitudeDouble, it.longitudeDouble)
+    )) {
+        Box(Modifier.wrapContentWidth().fillMaxHeight().padding(16.dp)) {
+            TruckLazyColumn(truckLocation) { location ->
+                location.latitude?.let { latitude ->
+                    location.longitude?.let { longitude ->
+                        focusOn(latitude.toDouble(), longitude.toDouble())
+                    }
+                }
             }
-            Spacer(
-                modifier = Modifier.width(1.dp).fillMaxHeight()
-                    .background(color = MaterialTheme.colors.onSurface.copy(0.25f))
-            )
         }
+
     }
 
-
-
-
 }
+
+
 

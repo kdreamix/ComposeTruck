@@ -15,15 +15,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TruckLocation(
-    val lineId: String,
-    val car: String,
-    val time: String,
-    val location: String,
-    val longitude: String,
-    val latitude: String,
-    val cityId: String,
-    val cityName: String,
+    val lineId: String?,
+    val car: String?,
+    val time: String?,
+    val location: String?,
+    val longitude: String?,
+    val latitude: String?,
+    val cityId: String?,
+    val cityName: String?,
 ){
-    val latitudeDouble = latitude.toDouble()
-    val longitudeDouble = longitude.toDouble()
+    val latitudeDouble = latitude?.toDouble()
+    val longitudeDouble = longitude?.toDouble()
 }
