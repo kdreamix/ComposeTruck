@@ -1,45 +1,29 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.desktop.Window
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.awt.SwingPanel
-import androidx.compose.ui.unit.dp
-import androidx.compose.desktop.Window
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import me.kit.common.module.commonModule
+import me.kit.common.ui.EmptyTruckList
+import me.kit.common.ui.SearchView
 import me.kit.common.ui.TruckLazyColumn
 import me.kit.commonDomain.network.TruckApis
 import me.kit.commonDomain.network.responses.TruckLocation
@@ -61,18 +45,27 @@ var map: JXMapViewer? = null
 
 @Composable
 @ExperimentalAnimationApi
-fun App() {
-    val scope = rememberCoroutineScope()
+fun App() = withDI(commonModule) {
     var truckListVisible by remember { mutableStateOf(true) }
+    val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
+    var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
+    var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
+    val api by rememberInstance<TruckApis>()
+
+    LaunchedEffect(true) {
+        truckRoute = api.fetchTruckRoute()
+        truckLocation = api.fetchTruckLocation()
+        addWayPoints(truckLocation)
+    }
 
     MaterialTheme {
         Scaffold(
-            content = { Content(truckListVisible) },
+            content = { Content(truckListVisible, searchTextState, truckRoute, truckLocation) },
             topBar = {
                 TruckAppBar(onMenuClick = {
                     Napier.d("Menu Clicked")
                     truckListVisible = !truckListVisible
-                })
+                }, searchTextState)
             },
         )
     }
@@ -80,27 +73,36 @@ fun App() {
 
 @Composable
 @ExperimentalAnimationApi
-fun Content(truckListVisible: Boolean) {
+fun Content(
+    truckListVisible: Boolean,
+    searchTextState: MutableState<TextFieldValue>,
+    truckRoute: List<TruckRoute>,
+    truckLocation: List<TruckLocation>
+) {
     Row {
-        Drawer(truckListVisible)
+        Drawer(truckListVisible, searchTextState, truckRoute, truckLocation)
         JMap()
     }
 }
 
 @Composable
-fun TruckAppBar(onMenuClick: () -> Unit) {
-    TopAppBar(title = { Text("Truck Map") }, navigationIcon = {
-        IconButton(onClick = { onMenuClick() }) {
-            Icon(Icons.Filled.Menu, null)
-        }
-    }, actions = {
-        IconButton(onClick = {/* Do Something*/ }) {
-            Icon(Icons.Filled.Share, null)
-        }
-        IconButton(onClick = {/* Do Something*/ }) {
-            Icon(Icons.Filled.Settings, null)
-        }
-    })
+fun TruckAppBar(onMenuClick: () -> Unit, searchTextState: MutableState<TextFieldValue>) {
+
+    TopAppBar(
+        title = { SearchView(searchTextState) },
+        navigationIcon = {
+            IconButton(onClick = { onMenuClick() }) {
+                Icon(Icons.Filled.Menu, null)
+            }
+        },
+        actions = {
+            IconButton(onClick = {/* Do Something*/ }) {
+                Icon(Icons.Filled.Share, null)
+            }
+            IconButton(onClick = {/* Do Something*/ }) {
+                Icon(Icons.Filled.Settings, null)
+            }
+        })
 }
 
 @Composable
@@ -158,40 +160,47 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
 
 @Composable
 @ExperimentalAnimationApi
-fun Drawer(visible: Boolean) = withDI(commonModule) {
-    var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
-    var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
+fun Drawer(
+    visible: Boolean,
+    searchTextState: MutableState<TextFieldValue>,
+    truckRoute: List<TruckRoute>,
+    truckLocation: List<TruckLocation>
+) {
+
     val state = rememberLazyListState()
 
     val density = LocalDensity.current
 
-    val api by rememberInstance<TruckApis>()
-
-    LaunchedEffect(true) {
-        truckRoute = api.fetchTruckRoute()
-        truckLocation = api.fetchTruckLocation()
-        addWayPoints(truckLocation)
-    }
+    val filteredList =
+        truckLocation.filter { it.cityName?.lowercase()?.contains(searchTextState.value.text.lowercase()) ?: true }
 
     AnimatedVisibility(visible, enter = slideInHorizontally(
         initialOffsetX = { with(density) { -40.dp.roundToPx() } }
     )) {
-        Box(Modifier.wrapContentWidth().fillMaxHeight()) {
-            TruckLazyColumn(truckLocation,state) { location ->
-                location.latitude?.let { latitude ->
-                    location.longitude?.let { longitude ->
-                        focusOn(latitude.toDouble(), longitude.toDouble())
+        if (filteredList.isEmpty()){
+            EmptyTruckList()
+        } else {
+            Box(
+                Modifier
+                    .defaultMinSize(minWidth = 180.dp)
+                    .wrapContentWidth()
+                    .fillMaxHeight()
+            ) {
+                TruckLazyColumn(filteredList, state) { location ->
+                    location.latitude?.let { latitude ->
+                        location.longitude?.let { longitude ->
+                            focusOn(latitude.toDouble(), longitude.toDouble())
+                        }
                     }
                 }
-            }
-            VerticalScrollbar(
-                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                adapter = rememberScrollbarAdapter(
-                    scrollState = state
+                VerticalScrollbar(
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                    adapter = rememberScrollbarAdapter(
+                        scrollState = state
+                    )
                 )
-            )
+            }
         }
-
     }
 
 }
