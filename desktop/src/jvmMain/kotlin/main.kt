@@ -25,9 +25,9 @@ import me.kit.common.module.commonModule
 import me.kit.common.ui.EmptyTruckList
 import me.kit.common.ui.SearchView
 import me.kit.common.ui.TruckLazyColumn
-import me.kit.commonDomain.network.TruckApis
 import me.kit.commonDomain.network.responses.TruckLocation
 import me.kit.commonDomain.network.responses.TruckRoute
+import me.kit.commonDomain.repo.TruckRepo
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.*
@@ -50,11 +50,11 @@ fun App() = withDI(commonModule) {
     val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
     var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
     var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
-    val api by rememberInstance<TruckApis>()
+    val repo by rememberInstance<TruckRepo>()
 
     LaunchedEffect(true) {
-        truckRoute = api.fetchTruckRoute()
-        truckLocation = api.fetchTruckLocation()
+        truckRoute = repo.fetchTruckRoute()
+        truckLocation = repo.fetchTruckLocation()
         addWayPoints(truckLocation)
     }
 
