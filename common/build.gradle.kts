@@ -38,8 +38,8 @@ kotlin {
                 api(compose.material)
                 api("org.kodein.di:kodein-di:$kodein")
                 api("org.kodein.di:kodein-di-framework-compose:$kodein")
-                implementation("com.arkivanov.decompose:decompose:$decompose")
-
+                api("com.arkivanov.decompose:decompose:$decompose")
+                api("com.arkivanov.decompose:extensions-compose-jetbrains:$decompose")
                 implementation(project(mapOf("path" to ":commonDomain")))
                 api("io.github.aakira:napier:$napierVersion")
 
@@ -50,7 +50,6 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.3.1")
                 api("androidx.core:core-ktx:1.6.0")
-                implementation("com.arkivanov.decompose:extensions-compose-jetpack:$decompose")
 
             }
         }
@@ -62,7 +61,6 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-java:$ktor_version")
-                implementation("com.arkivanov.decompose:extensions-compose-jetpack:$decompose")
 
 
             }

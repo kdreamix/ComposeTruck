@@ -19,15 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import me.kit.common.bloc.RootComponent
 import me.kit.common.module.commonModule
 import me.kit.common.ui.EmptyTruckList
 import me.kit.common.ui.SearchView
 import me.kit.common.ui.TruckLazyColumn
 import me.kit.commonDomain.network.responses.TruckLocation
 import me.kit.commonDomain.network.responses.TruckRoute
-import me.kit.commonDomain.repo.TruckRepo
 import org.jxmapviewer.JXMapViewer
 import org.jxmapviewer.OSMTileFactoryInfo
 import org.jxmapviewer.viewer.*
@@ -46,26 +47,23 @@ var map: JXMapViewer? = null
 @Composable
 @ExperimentalAnimationApi
 fun App() = withDI(commonModule) {
-    var truckListVisible by remember { mutableStateOf(true) }
-    val searchTextState = remember { mutableStateOf(TextFieldValue("")) }
-    var truckRoute by remember { mutableStateOf<List<TruckRoute>>(emptyList()) }
-    var truckLocation by remember { mutableStateOf<List<TruckLocation>>(emptyList()) }
-    val repo by rememberInstance<TruckRepo>()
+    val rootComponent by rememberInstance<RootComponent>()
+    val state by rootComponent.state.subscribeAsState()
 
     LaunchedEffect(true) {
-        truckRoute = repo.fetchTruckRoute()
-        truckLocation = repo.fetchTruckLocation()
-        addWayPoints(truckLocation)
+        rootComponent.startLoading()
+        addWayPoints(state.truckLocation)
     }
 
     MaterialTheme {
         Scaffold(
-            content = { Content(truckListVisible, searchTextState, truckRoute, truckLocation) },
+            content = { Content(state.truckListVisible, state.searchText, state.truckRoute, state.truckLocation) },
             topBar = {
-                TruckAppBar(onMenuClick = {
-                    Napier.d("Menu Clicked")
-                    truckListVisible = !truckListVisible
-                }, searchTextState)
+                TruckAppBar(
+                    onMenuClick = { rootComponent.onMenuClick() },
+                    onSearchTextChange = { rootComponent.onSearch(it) },
+                    searchTextState = state.searchText
+                )
             },
         )
     }
@@ -75,7 +73,7 @@ fun App() = withDI(commonModule) {
 @ExperimentalAnimationApi
 fun Content(
     truckListVisible: Boolean,
-    searchTextState: MutableState<TextFieldValue>,
+    searchTextState: TextFieldValue,
     truckRoute: List<TruckRoute>,
     truckLocation: List<TruckLocation>
 ) {
@@ -86,10 +84,14 @@ fun Content(
 }
 
 @Composable
-fun TruckAppBar(onMenuClick: () -> Unit, searchTextState: MutableState<TextFieldValue>) {
+fun TruckAppBar(
+    onMenuClick: () -> Unit,
+    onSearchTextChange: (TextFieldValue) -> Unit,
+    searchTextState: TextFieldValue
+) {
 
     TopAppBar(
-        title = { SearchView(searchTextState) },
+        title = { SearchView(searchTextState, onSearchTextChange) },
         navigationIcon = {
             IconButton(onClick = { onMenuClick() }) {
                 Icon(Icons.Filled.Menu, null)
@@ -162,7 +164,7 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
 @ExperimentalAnimationApi
 fun Drawer(
     visible: Boolean,
-    searchTextState: MutableState<TextFieldValue>,
+    searchTextState: TextFieldValue,
     truckRoute: List<TruckRoute>,
     truckLocation: List<TruckLocation>
 ) {
@@ -172,12 +174,12 @@ fun Drawer(
     val density = LocalDensity.current
 
     val filteredList =
-        truckLocation.filter { it.cityName?.lowercase()?.contains(searchTextState.value.text.lowercase()) ?: true }
+        truckLocation.filter { it.cityName?.lowercase()?.contains(searchTextState.text.lowercase()) ?: true }
 
     AnimatedVisibility(visible, enter = slideInHorizontally(
         initialOffsetX = { with(density) { -40.dp.roundToPx() } }
     )) {
-        if (filteredList.isEmpty()){
+        if (filteredList.isEmpty()) {
             EmptyTruckList()
         } else {
             Box(

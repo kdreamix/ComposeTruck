@@ -1,5 +1,8 @@
 package me.kit.common.module
 
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import me.kit.common.bloc.RootComponent
 import me.kit.commonDomain.network.TruckApisImpl
 import me.kit.commonDomain.network.TruckApis
 import me.kit.commonDomain.repo.TruckRepo
@@ -13,4 +16,5 @@ val commonModule = DI.Module("common module", false) {
     importOnce(platformModule())
     bind<TruckApis>() with singleton { TruckApisImpl(instance()) }
     bind<TruckRepo>() with singleton { TruckRepoImpl(instance()) }
+    bind<RootComponent>() with singleton { RootComponent(DefaultComponentContext(LifecycleRegistry()), instance()) }
 }
