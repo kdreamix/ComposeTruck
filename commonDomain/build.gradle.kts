@@ -4,6 +4,8 @@ plugins {
     kotlin("plugin.serialization") version "1.5.20"
     id("com.android.library")
     id("kotlin-android-extensions")
+    id("com.squareup.sqldelight")
+
 }
 
 group = "me.kit"
@@ -27,6 +29,7 @@ kotlin {
         val logack_version = "1.2.5"
         val kodein = "7.7.0"
         val kotlinx_serialization_json = "1.2.2"
+        val sqldelight = "1.5.0"
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_json")
@@ -46,6 +49,8 @@ kotlin {
                 api("androidx.core:core-ktx:1.6.0")
                 implementation("io.ktor:ktor-client-okhttp:$ktor_version")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_json")
+                implementation("com.squareup.sqldelight:android-driver:$sqldelight")
+
             }
         }
         val androidTest by getting {
@@ -56,11 +61,20 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-java:$ktor_version")
+                implementation("com.squareup.sqldelight:sqlite-driver:$sqldelight")
+
             }
         }
         val desktopTest by getting
 
 
+    }
+}
+
+sqldelight {
+    database("TruckDatabase") {
+        packageName = "com.me.kit"
+        sourceFolders = listOf("sqldelight")
     }
 }
 

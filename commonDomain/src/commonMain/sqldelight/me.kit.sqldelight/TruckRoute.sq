@@ -1,0 +1,48 @@
+CREATE TABLE TruckRoute (
+    id INTEGER NOT NULL PRIMARY KEY,
+    recyclingSunday TEXT,
+    wgs84aX TEXT,
+    wgs84aY TEXT,
+    garbageThursday TEXT,
+    city TEXT,
+    latitude TEXT,
+    lineName TEXT,
+    memo TEXT,
+    foodScrapsSunday TEXT,
+    foodScrapsSaturday TEXT,
+    foodScrapsWednesday TEXT,
+    rank TEXT,
+    foodScrapsMonday TEXT,
+    village TEXT,
+    recyclingSaturday TEXT,
+    foodScrapsFriday TEXT,
+    longitude TEXT,
+    recyclingTuesday TEXT,
+    recyclingThursday TEXT,
+    garbageMonday TEXT,
+    lineId TEXT,
+    recyclingFriday TEXT,
+    garbageTuesday TEXT,
+    recyclingMonday TEXT,
+    garbageWednesday TEXT,
+    foodScrapsTuesday TEXT,
+    recyclingWednesday TEXT,
+    twd97X TEXT,
+    twd97Y TEXT,
+    garbageFriday TEXT,
+    name TEXT,
+    garbageSunday TEXT,
+    foodScrapsThursday TEXT,
+    time TEXT,
+    garbageSaturday TEXT
+);
+
+deleteAll:
+DELETE FROM TruckRoute;
+
+selectAll:
+SELECT * FROM TruckRoute;
+
+insertItem:
+INSERT OR REPLACE INTO TruckRoute
+VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);

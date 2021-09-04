@@ -1,5 +1,6 @@
 package me.kit.commonDomain.repo
 
+import com.me.kit.TruckDatabase
 import me.kit.commonDomain.network.TruckApis
 import me.kit.commonDomain.network.responses.TruckLocation
 import me.kit.commonDomain.network.responses.TruckRoute
@@ -10,7 +11,7 @@ interface TruckRepo {
 
 }
 
-class TruckRepoImpl(private val truckApis: TruckApis) : TruckRepo {
+class TruckRepoImpl(private val truckApis: TruckApis, private val database: TruckDatabase) : TruckRepo {
     override suspend fun fetchTruckRoute(): List<TruckRoute> {
         return truckApis.fetchTruckRoute()
     }
