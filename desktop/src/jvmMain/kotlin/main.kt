@@ -1,7 +1,8 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.desktop.Window
+import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.ui.window.Window
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,13 +14,18 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import me.kit.common.bloc.RootComponent
@@ -37,9 +43,23 @@ import org.kodein.di.compose.withDI
 import javax.swing.*
 
 @ExperimentalAnimationApi
-fun main() = Window {
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = application {
     Napier.base(DebugAntilog())
-    App()
+
+    val lifecycle = LifecycleRegistry()
+
+    val windowState = rememberWindowState()
+
+    LifecycleController(lifecycle, windowState)
+
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Truck App",
+        state = windowState
+    ) {
+        App()
+    }
 }
 
 
@@ -55,7 +75,8 @@ fun App() = withDI(commonModule) {
         map.addWayPoints(state.truckLocation)
     }
 
-    MaterialTheme {
+
+    DesktopMaterialTheme {
         Scaffold(
             content = {
                 Content(
