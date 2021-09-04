@@ -42,22 +42,33 @@ fun main() = Window {
     App()
 }
 
-var map: JXMapViewer? = null
 
 @Composable
 @ExperimentalAnimationApi
 fun App() = withDI(commonModule) {
     val rootComponent by rememberInstance<RootComponent>()
     val state by rootComponent.state.subscribeAsState()
+    val map: JXMapViewer by remember { mutableStateOf(createMap()) }
 
     LaunchedEffect(true) {
         rootComponent.startLoading()
-        addWayPoints(state.truckLocation)
+        map.addWayPoints(state.truckLocation)
     }
 
     MaterialTheme {
         Scaffold(
-            content = { Content(state.truckListVisible, state.searchText, state.truckRoute, state.truckLocation) },
+            content = {
+                Content(
+                    map = map,
+                    truckListVisible = state.truckListVisible,
+                    searchTextState = state.searchText,
+                    truckRoute = state.truckRoute,
+                    truckLocation = state.truckLocation,
+                    onTruckClick = { lat, long ->
+                        map.focusOn(lat, long)
+                    }
+                )
+            },
             topBar = {
                 TruckAppBar(
                     onMenuClick = { rootComponent.onMenuClick() },
@@ -72,14 +83,16 @@ fun App() = withDI(commonModule) {
 @Composable
 @ExperimentalAnimationApi
 fun Content(
+    map: JXMapViewer,
     truckListVisible: Boolean,
     searchTextState: TextFieldValue,
     truckRoute: List<TruckRoute>,
-    truckLocation: List<TruckLocation>
+    truckLocation: List<TruckLocation>,
+    onTruckClick: (Double, Double) -> Unit
 ) {
     Row {
-        Drawer(truckListVisible, searchTextState, truckRoute, truckLocation)
-        JMap()
+        Drawer(truckListVisible, searchTextState, truckRoute, truckLocation, onTruckClick)
+        JMap(map)
     }
 }
 
@@ -108,14 +121,13 @@ fun TruckAppBar(
 }
 
 @Composable
-fun JMap() {
+fun JMap(map: JXMapViewer) {
     Box {
         SwingPanel(
             background = Color.White,
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             factory = {
                 JPanel().apply {
-                    map = createMap()
                     layout = BoxLayout(this, BoxLayout.Y_AXIS)
                     add(map)
                     setComponentZOrder(map, 0)
@@ -137,11 +149,11 @@ fun createMap(): JXMapViewer {
     return mapViewer
 }
 
-fun focusOn(latitude: Double, longitude: Double) {
-    map?.addressLocation = GeoPosition(latitude, longitude)
+fun JXMapViewer.focusOn(latitude: Double, longitude: Double) {
+    addressLocation = GeoPosition(latitude, longitude)
 }
 
-private fun addWayPoints(truckLocation: List<TruckLocation>) {
+private fun JXMapViewer.addWayPoints(truckLocation: List<TruckLocation>) {
     val wpp = WaypointPainter<Waypoint>()
     val wpSet = mutableSetOf<Waypoint>()
     truckLocation.forEach { location ->
@@ -157,7 +169,7 @@ private fun addWayPoints(truckLocation: List<TruckLocation>) {
     }
     // wpSet.add(Waypoint {GeoPosition(25.0143878,121.4798943)})
     wpp.waypoints = wpSet
-    map?.overlayPainter = wpp
+    overlayPainter = wpp
 }
 
 @Composable
@@ -166,7 +178,8 @@ fun Drawer(
     visible: Boolean,
     searchTextState: TextFieldValue,
     truckRoute: List<TruckRoute>,
-    truckLocation: List<TruckLocation>
+    truckLocation: List<TruckLocation>,
+    onTruckClick: (Double, Double) -> Unit
 ) {
 
     val state = rememberLazyListState()
@@ -191,7 +204,7 @@ fun Drawer(
                 TruckLazyColumn(filteredList, state) { location ->
                     location.latitude?.let { latitude ->
                         location.longitude?.let { longitude ->
-                            focusOn(latitude.toDouble(), longitude.toDouble())
+                            onTruckClick(latitude.toDouble(), longitude.toDouble())
                         }
                     }
                 }
