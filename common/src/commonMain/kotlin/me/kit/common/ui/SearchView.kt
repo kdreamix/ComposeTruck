@@ -23,11 +23,8 @@ import androidx.compose.ui.unit.sp
 fun SearchView(state: TextFieldValue, onValueChange:(TextFieldValue)-> Unit) {
     TextField(
         value = state,
-        onValueChange = { value ->
-            onValueChange(value)
-        },
-        modifier = Modifier
-            .fillMaxWidth(),
+        onValueChange = { value -> onValueChange(value) },
+        modifier = Modifier.fillMaxWidth(),
         textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
         leadingIcon = {
             Icon(
