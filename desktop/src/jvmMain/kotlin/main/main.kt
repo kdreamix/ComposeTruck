@@ -186,7 +186,7 @@ fun Drawer(
 
         Box(
             Modifier
-                .defaultMinSize(minWidth = 180.dp)
+                .defaultMinSize(minWidth = 300.dp)
                 .wrapContentWidth()
                 .fillMaxHeight()
         ) {
@@ -199,12 +199,21 @@ fun Drawer(
                             truckLocation.value.filter {
                                 it.cityName?.lowercase()?.contains(searchTextState.text.lowercase()) ?: true
                             }
-                        TruckLazyColumn(filteredLocationList, state) { location ->
+                        LocationLazyColumn(filteredLocationList, state) { location ->
                             location.latitude?.let { latitude ->
                                 location.longitude?.let { longitude ->
                                     onTruckClick(latitude.toDouble(), longitude.toDouble())
                                 }
                             }
+                        }
+                    }
+                }
+                when (truckRoute) {
+                    is TruckResult.Error -> TruckError(truckRoute.message)
+                    TruckResult.Loading -> TruckLoading()
+                    is TruckResult.Success -> {
+                        RouteLazyColumn(truckRoute.value, state) { route ->
+
                         }
                     }
                 }

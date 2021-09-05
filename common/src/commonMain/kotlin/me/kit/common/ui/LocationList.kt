@@ -18,7 +18,6 @@ import me.kit.commonDomain.network.responses.TruckLocation
 fun TruckLoading() {
     Box(contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
-
     }
 }
 
@@ -31,7 +30,7 @@ fun TruckError(message: String) {
 }
 
 @Composable
-fun TruckLazyColumn(truckLocation: List<TruckLocation>, state: LazyListState, onClick: (TruckLocation) -> Unit) {
+fun LocationLazyColumn(truckLocation: List<TruckLocation>, state: LazyListState, onClick: (TruckLocation) -> Unit) {
     if (truckLocation.isEmpty()){
         EmptyTruckList()
     } else {
@@ -41,15 +40,14 @@ fun TruckLazyColumn(truckLocation: List<TruckLocation>, state: LazyListState, on
             state = state
         ) {
             items(truckLocation) { where ->
-                TruckCard(where) { onClick(where) }
+                LocationCard(where) { onClick(where) }
             }
         }
     }
-
 }
 
 @Composable
-fun TruckCard(truckLocation: TruckLocation, onClick: (TruckLocation) -> Unit) {
+fun LocationCard(truckLocation: TruckLocation, onClick: (TruckLocation) -> Unit) {
     Card(
         modifier = Modifier
             .width(300.dp)
