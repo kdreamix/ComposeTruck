@@ -6,23 +6,46 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import me.kit.commonDomain.network.responses.TruckLocation
 
 @Composable
+fun TruckLoading() {
+    Box(contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+
+    }
+}
+
+@Composable
+fun TruckError(message: String) {
+    Box(contentAlignment = Alignment.Center) {
+        Text(text = message)
+
+    }
+}
+
+@Composable
 fun TruckLazyColumn(truckLocation: List<TruckLocation>, state: LazyListState, onClick: (TruckLocation) -> Unit) {
-    LazyColumn(
-        contentPadding = PaddingValues(all = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        state = state
-    ) {
-        items(truckLocation) { where ->
-            TruckCard(where) { onClick(where) }
+    if (truckLocation.isEmpty()){
+        EmptyTruckList()
+    } else {
+        LazyColumn(
+            contentPadding = PaddingValues(all = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            state = state
+        ) {
+            items(truckLocation) { where ->
+                TruckCard(where) { onClick(where) }
+            }
         }
     }
+
 }
 
 @Composable

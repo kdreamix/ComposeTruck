@@ -40,6 +40,7 @@ kotlin {
                 api("io.ktor:ktor-client-logging:$ktor_version")
                 api("org.kodein.di:kodein-di:$kodein")
                 api("org.kodein.di:kodein-di-framework-compose:$kodein")
+                api("com.squareup.sqldelight:coroutines-extensions:$sqldelight")
             }
         }
         val commonTest by getting

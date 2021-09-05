@@ -36,9 +36,8 @@ import jxmapviewer.createMap
 import jxmapviewer.focusOn
 import me.kit.common.bloc.RootComponent
 import me.kit.common.module.commonModule
-import me.kit.common.ui.EmptyTruckList
-import me.kit.common.ui.SearchView
-import me.kit.common.ui.TruckLazyColumn
+import me.kit.common.ui.*
+import me.kit.commonDomain.TruckResult
 import me.kit.commonDomain.network.responses.TruckLocation
 import me.kit.commonDomain.network.responses.TruckRoute
 import org.jxmapviewer.JXMapViewer
@@ -77,7 +76,10 @@ fun App() = withDI(commonModule) {
 
     LaunchedEffect(true) {
         rootComponent.startLoading()
-        map.addWayPoints(state.truckLocation)
+        val truckLocation = state.truckLocation
+        if (truckLocation is TruckResult.Success){
+            map.addWayPoints(truckLocation.value)
+        }
     }
 
     DesktopMaterialTheme {
@@ -111,8 +113,8 @@ fun Content(
     map: JXMapViewer,
     truckListVisible: Boolean,
     searchTextState: TextFieldValue,
-    truckRoute: List<TruckRoute>,
-    truckLocation: List<TruckLocation>,
+    truckRoute: TruckResult<List<TruckRoute>>,
+    truckLocation: TruckResult<List<TruckLocation>>,
     onTruckClick: (Double, Double) -> Unit
 ) {
     Row {
@@ -169,8 +171,8 @@ fun JMap(map: JXMapViewer) {
 fun Drawer(
     visible: Boolean,
     searchTextState: TextFieldValue,
-    truckRoute: List<TruckRoute>,
-    truckLocation: List<TruckLocation>,
+    truckRoute: TruckResult<List<TruckRoute>>,
+    truckLocation: TruckResult<List<TruckLocation>>,
     onTruckClick: (Double, Double) -> Unit
 ) {
 
@@ -178,36 +180,44 @@ fun Drawer(
 
     val density = LocalDensity.current
 
-    val filteredList =
-        truckLocation.filter { it.cityName?.lowercase()?.contains(searchTextState.text.lowercase()) ?: true }
-
     AnimatedVisibility(visible, enter = slideInHorizontally(
         initialOffsetX = { with(density) { -40.dp.roundToPx() } }
     )) {
-        if (filteredList.isEmpty()) {
-            EmptyTruckList()
-        } else {
-            Box(
-                Modifier
-                    .defaultMinSize(minWidth = 180.dp)
-                    .wrapContentWidth()
-                    .fillMaxHeight()
-            ) {
-                TruckLazyColumn(filteredList, state) { location ->
-                    location.latitude?.let { latitude ->
-                        location.longitude?.let { longitude ->
-                            onTruckClick(latitude.toDouble(), longitude.toDouble())
+
+        Box(
+            Modifier
+                .defaultMinSize(minWidth = 180.dp)
+                .wrapContentWidth()
+                .fillMaxHeight()
+        ) {
+            Row {
+                when (truckLocation) {
+                    is TruckResult.Error -> TruckError(truckLocation.message)
+                    TruckResult.Loading -> TruckLoading()
+                    is TruckResult.Success -> {
+                        val filteredLocationList =
+                            truckLocation.value.filter {
+                                it.cityName?.lowercase()?.contains(searchTextState.text.lowercase()) ?: true
+                            }
+                        TruckLazyColumn(filteredLocationList, state) { location ->
+                            location.latitude?.let { latitude ->
+                                location.longitude?.let { longitude ->
+                                    onTruckClick(latitude.toDouble(), longitude.toDouble())
+                                }
+                            }
                         }
                     }
                 }
-                VerticalScrollbar(
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                    adapter = rememberScrollbarAdapter(
-                        scrollState = state
-                    )
-                )
             }
+
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                adapter = rememberScrollbarAdapter(
+                    scrollState = state
+                )
+            )
         }
+
     }
 
 }
