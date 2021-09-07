@@ -2,6 +2,8 @@ plugins {
     id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("com.android.application")
     kotlin("android")
+    id("kotlin-parcelize") // Apply the plugin for Android
+
 }
 
 group = "me.kit"

@@ -25,7 +25,6 @@ kotlin {
                 implementation(project(":common"))
                 implementation(project(mapOf("path" to ":commonDomain")))
                 implementation(compose.desktop.currentOs)
-                api("org.jxmapviewer:jxmapviewer2:2.6")
 
             }
         }

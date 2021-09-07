@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.compose") version "1.0.0-alpha3"
     id("com.android.library")
     id("kotlin-android-extensions")
+
 }
 
 group = "me.kit"
@@ -31,6 +32,7 @@ kotlin {
         val kotlinx_serialization_json = "1.2.2"
         val napierVersion = "2.1.0"
         val decompose = "0.3.1"
+        val essenty = "0.1.3"
         val commonMain by getting {
             dependencies {
                 api(compose.runtime)
@@ -38,6 +40,8 @@ kotlin {
                 api(compose.material)
                 api("org.kodein.di:kodein-di:$kodein")
                 api("org.kodein.di:kodein-di-framework-compose:$kodein")
+                implementation("com.arkivanov.essenty:lifecycle:$essenty")
+                implementation("com.arkivanov.essenty:parcelable:$essenty")
                 api("com.arkivanov.decompose:decompose:$decompose")
                 api("com.arkivanov.decompose:extensions-compose-jetbrains:$decompose")
                 implementation(project(mapOf("path" to ":commonDomain")))
@@ -61,8 +65,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-java:$ktor_version")
-
-
+                implementation(compose.desktop.currentOs)
             }
         }
         val desktopTest by getting

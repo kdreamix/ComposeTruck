@@ -4,7 +4,9 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.me.kit.TruckDatabase
 import com.squareup.sqldelight.db.SqlDriver
+import me.kit.common.bloc.MainComponent
 import me.kit.common.bloc.RootComponent
+import me.kit.common.bloc.SplashComponent
 import me.kit.commonDomain.db.SqlDriverProvider
 import me.kit.commonDomain.network.TruckApisImpl
 import me.kit.commonDomain.network.TruckApis
@@ -21,5 +23,14 @@ val commonModule = DI.Module("common module", false) {
     bind<SqlDriver>() with singleton { SqlDriverProvider().sqldriver }
     bind<TruckApis>() with singleton { TruckApisImpl(instance()) }
     bind<TruckRepo>() with singleton { TruckRepoImpl(instance(), instance()) }
-    bind<RootComponent>() with singleton { RootComponent(DefaultComponentContext(LifecycleRegistry()), instance()) }
+
+    bind<RootComponent>() with singleton {
+        RootComponent(
+            DefaultComponentContext(LifecycleRegistry()),
+            instance(),
+            instance()
+        )
+    }
+    bind<MainComponent>() with singleton { MainComponent(instance()) }
+    bind<SplashComponent>() with singleton { SplashComponent() }
 }

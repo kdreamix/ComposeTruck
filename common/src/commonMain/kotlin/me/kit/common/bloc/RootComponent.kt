@@ -1,51 +1,49 @@
 package me.kit.common.bloc
 
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.value.MutableValue
-import com.arkivanov.decompose.value.Value
-import com.arkivanov.decompose.value.reduce
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import me.kit.commonDomain.TruckResult
-import me.kit.commonDomain.network.responses.TruckLocation
-import me.kit.commonDomain.network.responses.TruckRoute
-import me.kit.commonDomain.repo.TruckRepo
+import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.push
+import me.kit.common.routing.Configuration
+import me.kit.common.ui.expect.MainUi
+import me.kit.common.ui.expect.SplashUi
 
-data class RootState(
-//    val loadingRoute: Boolean = true,
-//    val loadingLocation: Boolean = true,
-//    val errorRoute: String = "",
-//    val errorLocation: String = "",
-    val truckRoute: TruckResult<List<TruckRoute>> = TruckResult.Loading,
-    val truckLocation: TruckResult<List<TruckLocation>> = TruckResult.Loading,
-    val truckListVisible: Boolean = false,
-    val searchText: TextFieldValue = TextFieldValue("")
-)
+class RootComponent(
+    componentContext: ComponentContext, // In Decompose each component has its own ComponentContext
+    private val splashComponent: SplashComponent,
+    private val mainComponent: MainComponent,
+) : ComponentContext by componentContext {
 
-class RootComponent(componentContext: ComponentContext, private val repo: TruckRepo) :
-    ComponentContext by componentContext {
-    private val _value = MutableValue(RootState())
-    val state: Value<RootState> = _value
+    private val router =
+        router(
+            configurationClass = Configuration::class,
+            initialConfiguration = { Configuration.Splash }, // Starting with List
+            childFactory = ::createChild // The Router calls this function, providing the child Configuration and ComponentContext
+        )
 
-    suspend fun startLoading() {
-        fetchTruckRoute().collect { result ->
-            _value.reduce { it.copy(truckRoute = result) }
-        }
-        fetchTruckLocation().collect { result ->
-            _value.reduce { it.copy(truckLocation = result) }
-        }
+    val routerState = router.state
 
+    private fun createChild(configuration: Configuration, context: ComponentContext): Content =
+        when (configuration) {
+            Configuration.Main -> main()
+            Configuration.Splash -> splash()
+        } // Configurations are handled exhaustively
+
+    private fun splash(): Content {
+        splashComponent.onLoadingDone = { router.push(Configuration.Main) }
+        return splashComponent
+            .asContent { SplashUi() }
     }
 
-    fun onMenuClick() {
-        _value.reduce { it.copy(truckListVisible = !it.truckListVisible) }
-    }
-
-    fun onSearch(searchText: TextFieldValue) {
-        _value.reduce { it.copy(searchText = searchText) }
-    }
-
-    private suspend fun fetchTruckRoute(): Flow<TruckResult<List<TruckRoute>>> = repo.fetchTruckRoute()
-    private suspend fun fetchTruckLocation(): Flow<TruckResult<List<TruckLocation>>> = repo.fetchTruckLocation()
+    private fun main(): Content =
+        mainComponent.asContent { MainUi() }
 }
+
+@Composable
+fun RootUi(rootComponent: RootComponent) {
+    Children(rootComponent.routerState) { child ->
+        child.instance()
+    }
+}
+
+

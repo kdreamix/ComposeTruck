@@ -63,6 +63,8 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-java:$ktor_version")
                 implementation("com.squareup.sqldelight:sqlite-driver:$sqldelight")
+                api("org.jxmapviewer:jxmapviewer2:2.6")
+
 
             }
         }

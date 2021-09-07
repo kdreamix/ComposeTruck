@@ -13,7 +13,7 @@ interface TruckApis {
 class TruckApisImpl(private val client: HttpClient) : TruckApis {
     override suspend fun fetchTruckRoute() = client.get<List<TruckRoute>>(EndPoints.TRUCK_ROUTE) {
         parameter("page", 0)
-        parameter("size", 100)
+        parameter("size", 1000)
     }
 
     override suspend fun fetchTruckLocation() = client.get<List<TruckLocation>>(EndPoints.TRUCK_LCOATIONS) {

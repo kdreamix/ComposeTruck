@@ -16,6 +16,7 @@ interface TruckRepo {
     suspend fun fetchTruckLocation(): Flow<TruckResult<List<TruckLocation>>>
     fun latestTruckRoute(): Flow<List<TruckRoute>>
     suspend fun saveTruckRoute(list: List<TruckRoute>)
+    suspend fun groupRoute(list: List<TruckRoute>): Map<String?, List<TruckRoute>>
     suspend fun deleteAllTruckRoute()
 }
 
@@ -44,6 +45,12 @@ class TruckRepoImpl(
             items.forEach {
                 database.truckRouteQueries.insert(it)
             }
+        }
+    }
+
+    override suspend fun groupRoute(list: List<TruckRoute>): Map<String?, List<TruckRoute>> {
+        return list.groupBy {
+            it.lineId
         }
     }
 

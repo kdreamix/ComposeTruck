@@ -1,4 +1,4 @@
-package jxmapviewer
+package me.kit.common
 
 import me.kit.commonDomain.network.responses.TruckLocation
 import org.jxmapviewer.JXMapViewer
